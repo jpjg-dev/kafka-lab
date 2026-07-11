@@ -4,3 +4,15 @@ server:
 spring:
   application:
     name: producer-service
+
+  kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+app:
+  kafka:
+    topic:
+      study-events: study.events.v1
