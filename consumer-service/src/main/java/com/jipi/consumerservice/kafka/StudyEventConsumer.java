@@ -1,5 +1,6 @@
 package com.jipi.consumerservice.kafka;
 
+import com.jipi.consumerservice.kafka.event.StudyMessageCreatedEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -25,45 +26,36 @@ public class StudyEventConsumer {
             topics = "${app.kafka.topic.study-events}",
             groupId = "${spring.kafka.consumer.group-id}"
     )
-    public void consume(ConsumerRecord<String, String> consumerRecord) {
+    public void consume(ConsumerRecord<String, StudyMessageCreatedEvent> consumerRecord) {
         /*
-         * ConsumerRecord<String, String>
+         * Kafka Record의 Value가 더 이상 String이 아니다.
          *
-         * 첫 번째 String:
-         * Kafka 메시지 Key 타입
-         *
-         * 두 번째 String:
-         * Kafka 메시지 Value 타입
-         *
-         * Producer가 StringSerializer를 사용했기 때문에
-         * Consumer도 StringDeserializer를 사용하고
-         * 결과적으로 String 타입으로 받는다.
+         * JacksonJsonDeserializer가 JSON을
+         * StudyMessageCreatedEvent 객체로 변환했다.
          */
+        StudyMessageCreatedEvent event = consumerRecord.value();
+
         log.info(
                 """
-                        
-                        Kafka 메시지 수신
-                        topic={}
-                        partition={}
-                        offset={}
-                        key={}
-                        value={}
-                        """,
-
-                // 메시지가 들어온 토픽 이름
+                
+                JSON Kafka 이벤트 수신
+                topic={}
+                partition={}
+                offset={}
+                key={}
+                eventId={}
+                userId={}
+                message={}
+                occurredAt={}
+                """,
                 consumerRecord.topic(),
-
-                // 메시지가 저장된 파티션 번호
                 consumerRecord.partition(),
-
-                // 해당 파티션 안에서의 메시지 위치
                 consumerRecord.offset(),
-
-                // Producer가 보낸 Key
                 consumerRecord.key(),
-
-                // Producer가 보낸 실제 메시지
-                consumerRecord.value()
+                event.eventId(),
+                event.userId(),
+                event.message(),
+                event.occurredAt()
         );
     }
 }

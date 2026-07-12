@@ -10,9 +10,17 @@ spring:
 
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
 
+
+      properties:
+        # Producer Java 클래스의 패키지명을
+        # Kafka Header에 기록하지 않는다.
+        #
+        # Producer와 Consumer가 서로 다른 Java 클래스를
+        # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
+        spring.json.add.type.headers: false
 app:
   kafka:
     topic:
-      study-events: study.events.v1
+      study-events: ${KAFKA_TOPIC_STUDY_EVENTS:study.message.created.v1}

@@ -1,5 +1,6 @@
 package com.jipi.producerservice.kafka;
 
+import com.jipi.producerservice.kafka.event.StudyMessageCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,12 +14,12 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RequiredArgsConstructor
 public class MessageProducer {
-    private final KafkaTemplate<String, String> kafkaTemplate;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
     @Value("${app.kafka.topic.study-events}")
     private String topic;
 
-    public CompletableFuture<SendResult<String, String>> sendMessage(String key, String message) {
-        log.info("key={}, message={}", key, message);
-        return kafkaTemplate.send(topic, key, message);
+    public CompletableFuture<SendResult<String, Object>> sendMessage(String key, StudyMessageCreatedEvent event) {
+        log.info("key={}, event={}", key, event);
+        return kafkaTemplate.send(topic, key, event);
     }
 }

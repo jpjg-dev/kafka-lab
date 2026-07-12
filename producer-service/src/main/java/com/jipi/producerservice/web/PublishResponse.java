@@ -5,6 +5,7 @@ public record PublishResponse(
         int partition,
         long offset,
         String key,
+        String eventId,
         String message
 ) {
 }
