@@ -34,28 +34,25 @@ public class StudyEventConsumer {
          * StudyMessageCreatedEvent 객체로 변환했다.
          */
         StudyMessageCreatedEvent event = consumerRecord.value();
-
         log.info(
-                """
-                
-                JSON Kafka 이벤트 수신
-                topic={}
-                partition={}
-                offset={}
-                key={}
-                eventId={}
-                userId={}
-                message={}
-                occurredAt={}
-                """,
-                consumerRecord.topic(),
+                "메시지 처리 시작: partition={}, offset={}, eventId={}, message={}",
                 consumerRecord.partition(),
                 consumerRecord.offset(),
-                consumerRecord.key(),
                 event.eventId(),
-                event.userId(),
-                event.message(),
-                event.occurredAt()
+                event.message()
+        );
+        /*
+         *   메세지에 "fail"이 포함되면
+         *   RuntimeException을 발생시켜서
+         *   Kafka가 재시도하도록 한다.
+         * */
+//        if (event.message().contains("fail")) {
+//            throw new RuntimeException("의도적으로 발생시킨 Consumer 처리 오류");
+//        }
+        log.info(
+                "메세지 처리완료: partition={}, offset={}",
+                consumerRecord.partition(),
+                consumerRecord.offset()
         );
     }
 }
