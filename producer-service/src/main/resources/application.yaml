@@ -5,6 +5,28 @@ spring:
   application:
     name: producer-service
 
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+        show_sql: true
+
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: 'jdbc:h2:mem:testdb'      # In-Memory Mode
+    # url: 'jdbc:h2:~/test'		# Embedded Mode
+    user: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
   kafka:
     bootstrap-servers: localhost:9092
 
@@ -17,7 +39,7 @@ spring:
         # Kafka Header에 기록하지 않는다.
         #
         # Producer와 Consumer가 서로 다른 Java 클래스를
-        # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
+      # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
       properties:
         spring.json.add.type.headers: false
 app:

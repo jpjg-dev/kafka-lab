@@ -1,14 +1,24 @@
 package com.jipi.consumerservice.kafka;
 
 import com.jipi.consumerservice.kafka.event.StudyMessageCreatedEvent;
+import com.jipi.consumerservice.kafka.failure.FailedKafkaMessage;
+import com.jipi.consumerservice.kafka.failure.FailedKafkaMessageRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class StudyEventConsumer {
+    private final FailedKafkaMessageRepository failedKafkaMessageRepository;
+    private final ObjectMapper objectMapper;
+
     /*
      * @KafkaListener
      *
@@ -66,10 +76,29 @@ public class StudyEventConsumer {
             groupId = "study-json-dlt-consumer-group"
     )
     public void consumeDlt(
-            ConsumerRecord<String, StudyMessageCreatedEvent> consumerRecord
+            ConsumerRecord<String, StudyMessageCreatedEvent> consumerRecord,
+            @Header(KafkaHeaders.DLT_ORIGINAL_TOPIC) String originalTopic,
+            @Header(KafkaHeaders.DLT_ORIGINAL_PARTITION) int originalPartition,
+            @Header(KafkaHeaders.DLT_ORIGINAL_OFFSET) long originalOffset,
+            @Header(value = KafkaHeaders.DLT_EXCEPTION_FQCN, required = false) String exceptionType,
+            @Header(value = KafkaHeaders.DLT_EXCEPTION_MESSAGE, required = false) String exceptionMessage
     ) {
         StudyMessageCreatedEvent event = consumerRecord.value();
+        String payload = objectMapper.writeValueAsString(event);
 
+        failedKafkaMessageRepository.save(FailedKafkaMessage.create(
+                originalTopic,
+                originalPartition,
+                originalOffset,
+                consumerRecord.topic(),
+                consumerRecord.partition(),
+                consumerRecord.offset(),
+                consumerRecord.key(),
+                payload,
+                event.eventId(),
+                exceptionType,
+                exceptionMessage
+        ));
         log.info(
                 """
                         DLT 메시지 수신
