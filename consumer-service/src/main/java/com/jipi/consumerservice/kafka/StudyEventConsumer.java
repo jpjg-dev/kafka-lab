@@ -35,7 +35,8 @@ public class StudyEventConsumer {
          */
         StudyMessageCreatedEvent event = consumerRecord.value();
         log.info(
-                "메시지 처리 시작: partition={}, offset={}, eventId={}, message={}",
+                "메시지 처리 시작: userId={}, partition={}, offset={}, eventId={}, message={}",
+                consumerRecord.key(),
                 consumerRecord.partition(),
                 consumerRecord.offset(),
                 event.eventId(),
@@ -46,13 +47,45 @@ public class StudyEventConsumer {
          *   RuntimeException을 발생시켜서
          *   Kafka가 재시도하도록 한다.
          * */
-//        if (event.message().contains("fail")) {
-//            throw new RuntimeException("의도적으로 발생시킨 Consumer 처리 오류");
-//        }
+        if (event.message().contains("fail")) {
+            throw new RuntimeException("의도적으로 발생시킨 Consumer 처리 오류");
+        }
         log.info(
-                "메세지 처리완료: partition={}, offset={}",
+                "메세지 처리완료: userId={}, partition={}, offset={}",
+                consumerRecord.key(),
                 consumerRecord.partition(),
                 consumerRecord.offset()
+        );
+    }
+
+    /*
+     * DLT전용 consume(Dead Letter Topic) 메시지 수신
+     */
+    @KafkaListener(
+            topics = "${app.kafka.topic.study-events-dlt}",
+            groupId = "study-json-dlt-consumer-group"
+    )
+    public void consumeDlt(
+            ConsumerRecord<String, StudyMessageCreatedEvent> consumerRecord
+    ) {
+        StudyMessageCreatedEvent event = consumerRecord.value();
+
+        log.info(
+                """
+                        DLT 메시지 수신
+                        topic={}
+                        partition={}
+                        offset={}
+                        key={}
+                        eventId={}
+                        message={}
+                        """,
+                consumerRecord.topic(),
+                consumerRecord.partition(),
+                consumerRecord.offset(),
+                consumerRecord.key(),
+                event.eventId(),
+                event.message()
         );
     }
 }

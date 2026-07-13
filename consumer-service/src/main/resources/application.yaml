@@ -54,6 +54,17 @@ spring:
         # 보안을 위해 전체 "*" 대신
         # 필요한 패키지만 명시한다.
         spring.json.trusted.packages: com.jipi.consumerservice.kafka.event
+    # Consumer가 실패 메시지를 DLT에 다시 발행하기 위한 Producer 설정
+    producer:
+      # 원본 메시지의 Key는 String
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      # 원본 메시지의 Value는 StudyMessageCreatedEvent 객체
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+
+      properties:
+        # Producer와 Consumer 클래스의 패키지 결합을 피한다.
+        spring.json.add.type.headers: false
 
     listener:
       # Listener 메서드가 메시지 한 건을 정상적으로 처리하면
@@ -68,3 +79,4 @@ app:
       # KAFKA_TOPIC_STUDY_EVENTS 환경변수가 있으면 그 값을 사용하고,
       # 없으면 study.message.created.v1을 사용한다.
       study-events: ${KAFKA_TOPIC_STUDY_EVENTS:study.message.created.v1}
+      study-events-dlt: ${KAFKA_TOPIC_STUDY_EVENTS_DLT:study.message.created.v1-dlt}
