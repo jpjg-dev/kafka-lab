@@ -5,9 +5,8 @@ spring:
   application:
     name: consumer-service
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
@@ -46,8 +45,8 @@ spring:
       # Kafka의 메시지 Key를 byte[]에서 String으로 변환
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
-      # Kafka의 메시지 Value를 byte[]에서 String으로 변환
-      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      # Kafka의 메시지 Value를 byte[]에서 object로 변환
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
 
       # Consumer Group에 저장된 Offset이 없을 때
       # 가장 오래된 메시지부터 읽는다.
@@ -80,7 +79,7 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
 
       # 원본 메시지의 Value는 StudyMessageCreatedEvent 객체
-      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
       properties:
         # Producer와 Consumer 클래스의 패키지 결합을 피한다.

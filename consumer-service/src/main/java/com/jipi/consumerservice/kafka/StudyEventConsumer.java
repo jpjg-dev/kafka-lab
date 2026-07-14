@@ -1,5 +1,6 @@
 package com.jipi.consumerservice.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jipi.consumerservice.kafka.event.StudyMessageCreatedEvent;
 import com.jipi.consumerservice.kafka.failure.FailedKafkaMessage;
 import com.jipi.consumerservice.kafka.failure.FailedKafkaMessageRepository;
@@ -11,7 +12,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
-import tools.jackson.databind.ObjectMapper;
 
 @Component
 @Slf4j
@@ -85,7 +85,13 @@ public class StudyEventConsumer {
             @Header(value = KafkaHeaders.DLT_EXCEPTION_MESSAGE, required = false) String exceptionMessage
     ) {
         StudyMessageCreatedEvent event = consumerRecord.value();
-        String payload = objectMapper.writeValueAsString(event);
+        String payload;
+        try {
+            payload = objectMapper.writeValueAsString(event);
+        } catch (Exception e) {
+            log.error("Failed to serialize event to JSON", e);
+            payload = event.toString();
+        }
         // 의도적인 복합유니크 제약 위반
         originalTopic = "study.message.created.v1";
         originalPartition = 0;
