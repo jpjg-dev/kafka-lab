@@ -64,6 +64,15 @@ public class FailedKafkaMessage {
     @Column(name = "failed_at", nullable = false, updatable = false)
     private Instant failedAt;
 
+    @Column(name = "retry_count", nullable = false)
+    private int retryCount;
+
+    @Column(name = "last_retried_at")
+    private Instant lastRetriedAt;
+
+    @Column(name = "last_retry_error", length = 2000)
+    private String lastRetryError;
+
     private FailedKafkaMessage(
             String originalTopic,
             Integer originalPartition,
@@ -90,6 +99,8 @@ public class FailedKafkaMessage {
         this.exceptionMessage = exceptionMessage;
         this.status = FailedKafkaMessageStatus.PENDING;
         this.failedAt = Instant.now();
+        this.retryCount = 0;
+
     }
 
     public static FailedKafkaMessage create(
