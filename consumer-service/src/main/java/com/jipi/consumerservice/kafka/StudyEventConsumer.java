@@ -3,6 +3,7 @@ package com.jipi.consumerservice.kafka;
 import com.jipi.consumerservice.kafka.event.StudyMessageCreatedEvent;
 import com.jipi.consumerservice.kafka.failure.FailedKafkaMessage;
 import com.jipi.consumerservice.kafka.failure.FailedKafkaMessageRepository;
+import com.jipi.consumerservice.kafka.failure.FailedKafkaMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -16,7 +17,7 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @RequiredArgsConstructor
 public class StudyEventConsumer {
-    private final FailedKafkaMessageRepository failedKafkaMessageRepository;
+    private final FailedKafkaMessageService failedKafkaMessageService;
     private final ObjectMapper objectMapper;
 
     /*
@@ -85,8 +86,12 @@ public class StudyEventConsumer {
     ) {
         StudyMessageCreatedEvent event = consumerRecord.value();
         String payload = objectMapper.writeValueAsString(event);
+        // 의도적인 복합유니크 제약 위반
+        originalTopic = "study.message.created.v1";
+        originalPartition = 0;
+        originalOffset = 0L;
 
-        failedKafkaMessageRepository.save(FailedKafkaMessage.create(
+        failedKafkaMessageService.saveIfAbsent(FailedKafkaMessage.create(
                 originalTopic,
                 originalPartition,
                 originalOffset,

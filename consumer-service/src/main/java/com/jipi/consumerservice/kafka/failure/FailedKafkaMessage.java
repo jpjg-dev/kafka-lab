@@ -4,10 +4,17 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.Instant;
 
 @Entity
-@Table(name = "failed_kafka_message")
+@Table(name = "failed_kafka_message",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_failed_kafka_message_original_position",
+                        columnNames = {
+                                "original_topic", "original_partition", "original_offset"
+                        })})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FailedKafkaMessage {
