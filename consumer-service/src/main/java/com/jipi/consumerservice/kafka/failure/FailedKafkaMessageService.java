@@ -87,9 +87,9 @@ public class FailedKafkaMessageService {
             // 5. 재발행 성공 상태 변경
             // 재발행 성공 후에는 DB에도 성공 완료 상태를 남겨서, 같은 메시지를 다시 재처리하지 않도록 막습니다.
             // 이 상태 변경이 있어야 운영자가 나중에 조회했을 때 "이미 재처리 완료된 메시지"인지 바로 알 수 있습니다.
-            failedKafkaMessageRepository.markRepublished(failedMessageId);
-            log.info("Kafka 메시지 재처리 성공. failedMessageId={}", failedMessageId);
-
+            if (failedKafkaMessageRepository.markRepublished(failedMessageId) == 1) {
+                log.info("Kafka 메시지 재처리 성공. failedMessageId={}", failedMessageId);
+            }
         } catch (Exception e) {
             // 실패 시에는 재처리 중 상태를 실패 상태로 되돌리거나, 재시도 가능 횟수/에러 사유를 기록하는 로직이 들어갈 수 있습니다.
             //即, 여기의 주석은 단순 로그가 아니라 이후 상태 전환 정책을 연결할 지점이라는 의미입니다.
