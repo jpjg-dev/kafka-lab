@@ -68,7 +68,33 @@ class IdempotentProducerScopeIntegrationTest {
         assertThat(records)
                 .extracting(ConsumerRecord::value)
                 .containsExactly("same-message", "same-message");
+        System.out.println(
+                "첫 번째 메시지: partition="
+                        + firstMetadata.partition()
+                        + ", offset="
+                        + firstMetadata.offset()
+        );
+
+        System.out.println(
+                "두 번째 메시지: partition="
+                        + secondMetadata.partition()
+                        + ", offset="
+                        + secondMetadata.offset()
+        );
+        records.forEach(record ->
+                System.out.println(
+                        "수신 메시지: partition="
+                                + record.partition()
+                                + ", offset="
+                                + record.offset()
+                                + ", key="
+                                + record.key()
+                                + ", value="
+                                + record.value()
+                )
+        );
     }
+
 
     private List<ConsumerRecord<String, String>> consumeFromBeginning(int expectedCount) {
         Map<String, Object> consumerProperties = Map.of(

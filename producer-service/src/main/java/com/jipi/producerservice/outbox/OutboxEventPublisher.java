@@ -37,6 +37,7 @@ public class OutboxEventPublisher {
                     outboxEvent.getMessageKey(),
                     payload
             ).join();
+            
             RecordMetadata recordMetadata = sendResult.getRecordMetadata();
 
             outboxEvent.markPublished();
