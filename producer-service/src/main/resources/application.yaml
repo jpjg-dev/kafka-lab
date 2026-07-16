@@ -41,6 +41,8 @@ spring:
       # Producer와 Consumer가 서로 다른 Java 클래스를
       # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
       properties:
+        enable.idempotence: ${KAFKA_PRODUCER_ENABLE_IDEMPOTENCE:true}
+        max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_MAX_IN_FLIGHT_REQUESTS:5}
         spring.json.add.type.headers: false
 app:
   outbox:
