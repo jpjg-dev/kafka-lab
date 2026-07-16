@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -30,19 +32,22 @@ public class OutboxEventPublisher {
             JsonNode payload =
                     objectMapper.readTree(outboxEvent.getPayload());
 
-            kafkaTemplate.send(
+            SendResult<String, Object> sendResult = kafkaTemplate.send(
                     outboxEvent.getTopic(),
                     outboxEvent.getMessageKey(),
                     payload
             ).join();
+            RecordMetadata recordMetadata = sendResult.getRecordMetadata();
 
             outboxEvent.markPublished();
 
             log.info(
-                    "Outbox 이벤트 발행 성공. eventId={}, topic={}, key={}",
+                    "Outbox 이벤트 발행 성공. eventId={}, topic={}, key={}, partition={}, offset={}",
                     outboxEvent.getEventId(),
-                    outboxEvent.getTopic(),
-                    outboxEvent.getMessageKey()
+                    recordMetadata.topic(),
+                    outboxEvent.getMessageKey(),
+                    recordMetadata.partition(),
+                    recordMetadata.offset()
             );
         } catch (Exception e) {
             log.error(
