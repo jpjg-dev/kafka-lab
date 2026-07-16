@@ -20,7 +20,7 @@ class IdempotentProducerConfigTest {
         ProducerConfig producerConfig = new ProducerConfig(properties);
 
         assertThat(producerConfig.getBoolean(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG)).isTrue();
-        assertThat(producerConfig.getString(ProducerConfig.ACKS_CONFIG)).isEqualTo("all");
+        assertThat(producerConfig.getString(ProducerConfig.ACKS_CONFIG)).isEqualTo("-1");
         assertThat(producerConfig.getInt(ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION)).isEqualTo(5);
     }
 
