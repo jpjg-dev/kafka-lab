@@ -34,14 +34,17 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 
-        # Producer Java 클래스의 패키지명을
-        # Kafka Header에 기록하지 않는다.
-        #
-        # Producer와 Consumer가 서로 다른 Java 클래스를
+      # Producer Java 클래스의 패키지명을
+      # Kafka Header에 기록하지 않는다.
+      #
+      # Producer와 Consumer가 서로 다른 Java 클래스를
       # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
       properties:
         spring.json.add.type.headers: false
 app:
+  outbox:
+    publisher:
+      fixed-delay-ms: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:30000}
   kafka:
     topic:
       study-events: ${KAFKA_TOPIC_STUDY_EVENTS:study.message.created.v1}

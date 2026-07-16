@@ -23,7 +23,7 @@ public class StudyMessageService {
     private String studyEventsTopic;
 
     @Transactional
-    public void creatMessage(String userId, String message) {
+    public void createMessage(String userId, String message) {
         StudyMessage studyMessage = studyMessageRepository.save(StudyMessage.create(userId, message));
 
         StudyMessageCreatedEvent event =
@@ -36,6 +36,6 @@ public class StudyMessageService {
         }
 
         outboxEventRepository.save(OutboxEvent.create(
-                event.eventId(), studyEventsTopic, studyMessage.getId().toString(), payload));
+                event.eventId(), studyEventsTopic, studyMessage.getUserId(), payload));
     }
 }

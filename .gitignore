@@ -35,3 +35,25 @@ out/
 
 ### VS Code ###
 .vscode/
+
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Local Spring configuration
+**/application-local.yml
+**/application-local.yaml
+**/application-secret.yml
+**/application-secret.yaml
+
+# Keys and certificates
+*.pem
+*.key
+*.p12
+*.jks
+
+# Logs
+logs/
+*.log

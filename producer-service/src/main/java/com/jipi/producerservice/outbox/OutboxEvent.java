@@ -58,6 +58,18 @@ public class OutboxEvent {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    public void markPublished() {
+        if (this.status != OutboxEventStatus.PENDING) {
+            throw new IllegalStateException(
+                    "PENDING 상태의 이벤트만 발행 완료 처리할 수 있습니다. eventId="
+                            + eventId
+            );
+        }
+
+        this.status = OutboxEventStatus.PUBLISHED;
+        this.publishedAt = Instant.now();
+    }
+
     private OutboxEvent(
             String eventId,
             String topic,
@@ -85,4 +97,5 @@ public class OutboxEvent {
                 payload
         );
     }
+
 }

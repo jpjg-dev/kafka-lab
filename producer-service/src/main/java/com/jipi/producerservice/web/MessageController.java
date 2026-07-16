@@ -24,7 +24,7 @@ public class MessageController {
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody MessageRequest messageRequest) {
-        studyMessageService.creatMessage(messageRequest.key(), messageRequest.message());
+        studyMessageService.createMessage(messageRequest.key(), messageRequest.message());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
