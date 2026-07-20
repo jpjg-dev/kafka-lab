@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+// 21강: batch.size, linger.ms, compression.type 설정 조합 검증
 class ProducerBatchingConfigTest {
 
     @Test
@@ -79,6 +80,7 @@ class ProducerBatchingConfigTest {
                 );
     }
 
+    // 21강: 배치와 압축을 활성화할 기본 Producer 설정
     private Map<String, Object> validBatchingProducerProperties() {
         Map<String, Object> properties = new HashMap<>();
 
