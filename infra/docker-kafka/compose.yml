@@ -1,6 +1,8 @@
 services:
+  # 1강: Docker Compose 기반 단일 Kafka Broker
   kafka:
     image: apache/kafka:3.8.1
     container_name: kafka
     ports:
+      # 1강: 로컬 애플리케이션에서만 접근할 Kafka Broker 포트
       - "127.0.0.1:9092:9092"
