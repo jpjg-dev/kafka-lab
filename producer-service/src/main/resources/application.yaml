@@ -33,6 +33,8 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       acks: ${KAFKA_PRODUCER_ACKS:all}
+      batch-size: ${KAFKA_PRODUCER_BATCH_SIZE:32768}
+      compression-type: ${KAFKA_PRODUCER_COMPRESSION_TYPE:lz4}
 
 
       # Producer Java 클래스의 패키지명을
