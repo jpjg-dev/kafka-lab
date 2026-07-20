@@ -11,6 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+// 19강: Idempotent Producer 필수 설정 조합과 잘못된 조합을 검증
 class IdempotentProducerConfigTest {
 
     @Test
@@ -44,6 +45,7 @@ class IdempotentProducerConfigTest {
                 .hasMessageContaining("max.in.flight.requests.per.connection");
     }
 
+    // 19강: enable.idempotence=true에 필요한 acks와 max.in.flight 기본 조합
     private Map<String, Object> validIdempotentProducerProperties() {
         Map<String, Object> properties = new HashMap<>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
