@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// 19강: Idempotent Producer가 애플리케이션의 중복 send 호출까지 제거하지는 않는다는 범위 검증
 @SpringJUnitConfig
 @EmbeddedKafka(partitions = 1, topics = IdempotentProducerScopeIntegrationTest.TOPIC)
 class IdempotentProducerScopeIntegrationTest {
@@ -44,6 +45,7 @@ class IdempotentProducerScopeIntegrationTest {
                 ProducerConfig.MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION, 5
         );
 
+        // 19강: 동일한 Key와 Value라도 애플리케이션이 send를 두 번 호출하면 서로 다른 레코드로 발행
         RecordMetadata firstMetadata;
         RecordMetadata secondMetadata;
         try (KafkaProducer<String, String> producer = new KafkaProducer<>(producerProperties)) {
@@ -96,6 +98,7 @@ class IdempotentProducerScopeIntegrationTest {
     }
 
 
+    // 19강: Embedded Kafka의 첫 Offset부터 두 레코드를 직접 조회
     private List<ConsumerRecord<String, String>> consumeFromBeginning(int expectedCount) {
         Map<String, Object> consumerProperties = Map.of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, embeddedKafkaBroker.getBrokersAsString(),
