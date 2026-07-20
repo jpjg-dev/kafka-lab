@@ -7,9 +7,11 @@ import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
+// 13강: DLT로 이동한 메시지와 원본 위치, 예외 정보를 저장하는 실패 이력 엔티티
 @Entity
 @Table(name = "failed_kafka_message",
         uniqueConstraints = {
+                // 14강: 동일한 원본 Kafka 레코드의 실패 이력이 중복 저장되지 않도록 보장
                 @UniqueConstraint(
                         name = "uk_failed_kafka_message_original_position",
                         columnNames = {
@@ -57,6 +59,7 @@ public class FailedKafkaMessage {
     @Column(name = "exception_message", length = 2000)
     private String exceptionMessage;
 
+    // 15강: PENDING, RETRYING, REPUBLISHED, RETRY_FAILED 재처리 상태 관리
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private FailedKafkaMessageStatus status;
