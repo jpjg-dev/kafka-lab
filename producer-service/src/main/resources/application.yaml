@@ -32,24 +32,32 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      # 18강: Broker ACK와 내구성
       acks: ${KAFKA_PRODUCER_ACKS:all}
+
+      # 21강: Producer 배치 크기
       batch-size: ${KAFKA_PRODUCER_BATCH_SIZE:32768}
+
+      # 21강: 메시지 압축 방식
       compression-type: ${KAFKA_PRODUCER_COMPRESSION_TYPE:lz4}
 
-
-      # Producer Java 클래스의 패키지명을
-      # Kafka Header에 기록하지 않는다.
-      #
-      # Producer와 Consumer가 서로 다른 Java 클래스를
-      # 사용하기 때문에 코드 결합을 방지하기 위한 설정이다.
       properties:
+        # 19강: Idempotent Producer
         enable.idempotence: ${KAFKA_PRODUCER_ENABLE_IDEMPOTENCE:true}
+
+        # 20강: 메시지 순서 보장과 동시 전송 요청 수
         max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_MAX_IN_FLIGHT_REQUESTS:5}
+
+        # 7강: Producer 타입 헤더 비활성화
         spring.json.add.type.headers: false
+
 app:
   outbox:
     publisher:
+      # 17강: Outbox Publisher 실행 간격
       fixed-delay-ms: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:30000}
   kafka:
     topic:
+      # 2강: Producer 발행 토픽
       study-events: ${KAFKA_TOPIC_STUDY_EVENTS:study.message.created.v1}
