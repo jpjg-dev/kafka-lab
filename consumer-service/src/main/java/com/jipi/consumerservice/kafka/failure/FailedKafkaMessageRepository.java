@@ -10,6 +10,7 @@ import java.time.Instant;
 
 public interface FailedKafkaMessageRepository extends JpaRepository<FailedKafkaMessage, Long> {
 
+    // 15강: 재처리 가능한 상태만 RETRYING으로 변경하는 조건부 원자적 UPDATE
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("""
@@ -32,6 +33,7 @@ public interface FailedKafkaMessageRepository extends JpaRepository<FailedKafkaM
             @Param("retriedAt") Instant retriedAt
     );
 
+    // 15강: RETRYING 상태의 메시지만 REPUBLISHED로 완료 처리
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("""
@@ -44,6 +46,7 @@ public interface FailedKafkaMessageRepository extends JpaRepository<FailedKafkaM
             """)
     int markRepublished(@Param("id") Long id);
 
+    // 15강: 재발행 또는 재처리 메시지의 재실패 원인을 RETRY_FAILED 상태로 기록
     @Transactional
     @Modifying(clearAutomatically = true)
     @Query("""
