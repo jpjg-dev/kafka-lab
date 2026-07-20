@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// 20강: 같은 Key의 메시지가 같은 파티션에서 Offset 순서대로 저장되는지 검증
 @SpringJUnitConfig
 @EmbeddedKafka(
         partitions = 3,
@@ -55,6 +56,7 @@ class MessageOrderingIntegrationTest {
 
         List<RecordMetadata> metadataList = new ArrayList<>();
 
+        // 20강: 동일한 userId Key로 메시지 5건을 순차 발행
         try (KafkaProducer<String, String> producer =
                      new KafkaProducer<>(producerProperties)) {
 
@@ -71,6 +73,7 @@ class MessageOrderingIntegrationTest {
             }
         }
 
+        // 20강: 같은 Key의 모든 레코드가 같은 파티션과 연속 Offset을 갖는지 확인
         int assignedPartition = metadataList.getFirst().partition();
 
         assertThat(metadataList)
@@ -115,6 +118,7 @@ class MessageOrderingIntegrationTest {
         );
     }
 
+    // 20강: 지정 파티션의 첫 Offset부터 메시지를 직접 소비해 저장 순서 확인
     private List<ConsumerRecord<String, String>> consumeFromBeginning(
             int partition,
             int expectedCount
