@@ -5,6 +5,7 @@ spring:
   application:
     name: producer-service
 
+  # 16강: 비즈니스 데이터와 Outbox 이벤트를 저장할 로컬 데이터베이스
   jpa:
     hibernate:
       ddl-auto: create
@@ -14,6 +15,7 @@ spring:
         format_sql: true
         show_sql: true
 
+  # 16강: Transactional Outbox 실습용 H2 데이터소스
   datasource:
     driver-class-name: org.h2.Driver
     url: 'jdbc:h2:mem:testdb'      # In-Memory Mode
@@ -21,16 +23,21 @@ spring:
     user: sa
     password:
 
+  # 16강: Outbox 저장 결과를 확인할 H2 Console
   h2:
     console:
       enabled: true
       path: /h2-console
 
   kafka:
+    # 2강: Producer가 접속할 Kafka Broker
     bootstrap-servers: localhost:9092
 
     producer:
+      # 2강: Kafka 메시지 Key를 String으로 직렬화
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+      # 7강: Kafka 이벤트 객체를 JSON으로 직렬화
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
       # 18강: Broker ACK와 내구성
@@ -43,13 +50,13 @@ spring:
       compression-type: ${KAFKA_PRODUCER_COMPRESSION_TYPE:lz4}
 
       properties:
-        # 19강: Idempotent Producer
+        # 19강: Kafka Client 내부 재시도 중 중복 저장 방지
         enable.idempotence: ${KAFKA_PRODUCER_ENABLE_IDEMPOTENCE:true}
 
-        # 20강: 메시지 순서 보장과 동시 전송 요청 수
+        # 20강: 재시도 상황에서도 파티션 내부 순서를 유지할 동시 전송 요청 수
         max.in.flight.requests.per.connection: ${KAFKA_PRODUCER_MAX_IN_FLIGHT_REQUESTS:5}
 
-        # 7강: Producer 타입 헤더 비활성화
+        # 7강: Producer와 Consumer 이벤트 클래스의 패키지 결합 방지
         spring.json.add.type.headers: false
 
 app:
@@ -59,5 +66,5 @@ app:
       fixed-delay-ms: ${OUTBOX_PUBLISHER_FIXED_DELAY_MS:30000}
   kafka:
     topic:
-      # 2강: Producer 발행 토픽
+      # 2강: Producer가 이벤트를 발행할 토픽
       study-events: ${KAFKA_TOPIC_STUDY_EVENTS:study.message.created.v1}
