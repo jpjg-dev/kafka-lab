@@ -78,3 +78,12 @@ app:
 
       # 11~12강: 재시도 소진 메시지를 소비할 DLT 토픽
       study-events-dlt: ${KAFKA_TOPIC_STUDY_EVENTS_DLT:study.message.created.v1-dlt}
+
+# 22강: Kafka Consumer Monitoring을 위한 Actuator Endpoint
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - metrics
