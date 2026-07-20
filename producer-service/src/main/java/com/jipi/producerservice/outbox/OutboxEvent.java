@@ -17,12 +17,14 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+// 16강: Kafka 발행 전 이벤트를 로컬 트랜잭션으로 저장할 Outbox 엔티티
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(
         name = "outbox_event",
         uniqueConstraints = {
+                // 16강: 같은 eventId의 Outbox 이벤트가 중복 저장되지 않도록 보장
                 @UniqueConstraint(
                         name = "uk_outbox_event_event_id",
                         columnNames = "event_id"
@@ -48,6 +50,7 @@ public class OutboxEvent {
     @Column(nullable = false)
     private String payload;
 
+    // 16~17강: Kafka 발행 전 PENDING, 발행 성공 후 PUBLISHED 상태 관리
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private OutboxEventStatus status;
@@ -58,6 +61,7 @@ public class OutboxEvent {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    // 17~18강: Broker 발행 성공을 확인한 경우에만 발행 완료 상태로 변경
     public void markPublished() {
         if (this.status != OutboxEventStatus.PENDING) {
             throw new IllegalStateException(
