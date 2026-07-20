@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// 21강: 실제 Producer 메트릭으로 배치 형성과 압축 적용 여부 검증
 @SpringJUnitConfig
 @EmbeddedKafka(
         partitions = 1,
@@ -69,10 +70,8 @@ class ProducerBatchingMetricsIntegrationTest {
             }
 
             /*
-             * send() 직후 get()이나 join()을 호출하지 않는다.
-             *
-             * 여러 레코드가 Producer의 RecordAccumulator에
-             * 함께 들어가야 배치가 만들어질 수 있다.
+             * 21강: send() 직후 get()이나 join()을 호출하지 않는다.
+             * 여러 레코드가 RecordAccumulator에 함께 들어가야 배치가 형성된다.
              */
             producer.flush();
 
@@ -198,8 +197,8 @@ class ProducerBatchingMetricsIntegrationTest {
         );
 
         /*
-         * 로컬 통합 테스트에서 배치 동작을 확실하게
-         * 관찰하기 위해 application.yaml보다 크게 설정한다.
+         * 21강: 로컬 통합 테스트에서 배치 동작을 확실히 관찰하기 위해
+         * application.yaml보다 큰 linger.ms 값을 사용한다.
          */
         properties.put(
                 ProducerConfig.LINGER_MS_CONFIG,
@@ -214,6 +213,7 @@ class ProducerBatchingMetricsIntegrationTest {
         return properties;
     }
 
+    // 21강: Kafka Producer의 producer-metrics 그룹에서 지정 메트릭 값을 조회
     private double metricValue(
             KafkaProducer<String, String> producer,
             String metricName
