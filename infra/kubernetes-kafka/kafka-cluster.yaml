@@ -1,0 +1,75 @@
+# 24강: Kubernetes에서 운영할 Kafka Node Pool
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaNodePool
+metadata:
+  name: dual-role
+  labels:
+    strimzi.io/cluster: kafka-lab
+spec:
+  # 23강의 3 Broker 구성을 그대로 유지
+  replicas: 3
+
+  # 로컬 실습에서는 각 노드가 Broker와 Controller 역할을 함께 수행
+  roles:
+    - controller
+    - broker
+
+  # Pod가 다시 생성되어도 Kafka 데이터를 유지할 영구 저장소
+  storage:
+    type: jbod
+    volumes:
+      - id: 0
+        type: persistent-claim
+        size: 2Gi
+        deleteClaim: false
+        kraftMetadata: shared
+
+  # 로컬 Kubernetes 실습용 최소 자원 설정
+  resources:
+    requests:
+      cpu: 250m
+      memory: 1Gi
+    limits:
+      cpu: "1"
+      memory: 2Gi
+
+---
+# 24강: Strimzi가 관리할 Kafka Cluster
+apiVersion: kafka.strimzi.io/v1
+kind: Kafka
+metadata:
+  name: kafka-lab
+spec:
+  kafka:
+    version: 4.3.0
+    metadataVersion: 4.3-IV0
+
+    listeners:
+      # Kubernetes 내부 애플리케이션용
+      - name: plain
+        port: 9092
+        type: internal
+        tls: false
+
+    config:
+      # Topic은 KafkaTopic 리소스로 명시적으로 생성
+      auto.create.topics.enable: false
+
+      # 23강에서 사용한 기본 Partition 수
+      num.partitions: 3
+
+      # Consumer Offset 내부 Topic 내구성
+      offsets.topic.replication.factor: 3
+
+      # Kafka Transaction 내부 Topic 내구성
+      transaction.state.log.replication.factor: 3
+      transaction.state.log.min.isr: 2
+
+      # 일반 Topic 기본 내구성
+      default.replication.factor: 3
+      min.insync.replicas: 2
+
+  # Topic과 User도 Kubernetes 리소스로 관리
+  entityOperator:
+    topicOperator: { }
+    userOperator: { }

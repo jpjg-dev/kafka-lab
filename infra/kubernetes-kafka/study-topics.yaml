@@ -1,0 +1,29 @@
+# 24강: Producer가 이벤트를 발행할 원본 Topic
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: study-message-created-v1
+  labels:
+    strimzi.io/cluster: kafka-lab
+spec:
+  # 실제 Kafka Topic 이름에는 점을 사용할 수 있음
+  topicName: study.message.created.v1
+  partitions: 3
+  replicas: 3
+  config:
+    min.insync.replicas: 2
+
+---
+# 24강: 처리 실패 메시지가 저장될 DLT
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: study-message-created-v1-dlt
+  labels:
+    strimzi.io/cluster: kafka-lab
+spec:
+  topicName: study.message.created.v1-dlt
+  partitions: 3
+  replicas: 3
+  config:
+    min.insync.replicas: 2

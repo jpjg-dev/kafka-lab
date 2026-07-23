@@ -33,7 +33,7 @@ spring:
     #    # 3강: Consumer가 접속할 Kafka Broker
     #    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     # 23강: Toxiproxy를 경유하여 3대의 Kafka Broker에 접속
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29192,localhost:39192,localhost:49192}
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:172.23.0.2:30534,172.23.0.3:30534,172.23.0.5:30534}
 
     consumer:
       # 5강: 메시지를 분산 처리할 Consumer Group
