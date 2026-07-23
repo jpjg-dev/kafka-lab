@@ -1,8 +1,80 @@
+x-kafka-service: &kafka-service
+  image: apache/kafka:3.8.1
+  restart: unless-stopped
+
+x-kafka-environment: &kafka-environment
+  KAFKA_PROCESS_ROLES: broker,controller
+  KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka-1:9093,2@kafka-2:9093,3@kafka-3:9093
+
+  KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+  KAFKA_LISTENERS: INTERNAL://:19092,CONTROLLER://:9093,EXTERNAL://:9092
+  KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+  KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+  CLUSTER_ID: 4L6g3nShT-eMCtK--X86sw
+
+  KAFKA_NUM_PARTITIONS: 3
+  KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+  KAFKA_MIN_INSYNC_REPLICAS: 2
+
+  KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 3
+  KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 2
+
+  KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+  KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+
 services:
-  # 1강: Docker Compose 기반 단일 Kafka Broker
-  kafka:
-    image: apache/kafka:3.8.1
-    container_name: kafka
+  # 23강: 첫 번째 Kafka Broker와 KRaft Controller
+  kafka-1:
+    <<: *kafka-service
+    hostname: kafka-1
+    container_name: kafka-1
+    environment:
+      <<: *kafka-environment
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:19092,EXTERNAL://localhost:29192
+
+  # 23강: 두 번째 Kafka Broker와 KRaft Controller
+  kafka-2:
+    <<: *kafka-service
+    hostname: kafka-2
+    container_name: kafka-2
+    environment:
+      <<: *kafka-environment
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-2:19092,EXTERNAL://localhost:39192
+
+  # 23강: 세 번째 Kafka Broker와 KRaft Controller
+  kafka-3:
+    <<: *kafka-service
+    hostname: kafka-3
+    container_name: kafka-3
+    environment:
+      <<: *kafka-environment
+      KAFKA_NODE_ID: 3
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-3:19092,EXTERNAL://localhost:49192
+
+  # 23강: Kafka 클라이언트 네트워크 장애를 재현할 TCP Proxy
+  toxiproxy:
+    image: shopify/toxiproxy:2.1.4
+    hostname: toxiproxy
+    container_name: toxiproxy
     ports:
-      # 1강: 로컬 애플리케이션에서만 접근할 Kafka Broker 포트
-      - "127.0.0.1:9092:9092"
+      - "127.0.0.1:8474:8474"
+      - "127.0.0.1:29192:29192"
+      - "127.0.0.1:39192:39192"
+      - "127.0.0.1:49192:49192"
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
+    #services:
+    #  # 1강: Docker Compose 기반 단일 Kafka Broker
+    #  kafka:
+    #    image: apache/kafka:3.8.1
+    #    container_name: kafka
+    #    ports:
+    #      # 1강: 로컬 애플리케이션에서만 접근할 Kafka Broker 포트
+    #      - "127.0.0.1:9092:9092"
